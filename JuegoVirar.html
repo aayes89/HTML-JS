@@ -1,0 +1,161 @@
+<!--
+Hecho por Allan Ayes
+Si quieren las estructuras del sitio por separado, descomentar y crear los ficheros segun el nombre descrito en estos.
+Podría añadir un contar inverso para que al concluir acabe el juego, también una tabla de scores.
+Añadí algunas modificaciones para que muestre los movimientos hechos y el tiempo transcurrido. 
+-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Juego de Memoria</title>
+    <style type="text/css">
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    gap: 10px;
+    margin-right: 20px;
+}
+
+.card {
+    width: 100px;
+    height: 150px;
+    background-color: #000000;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.card.flip {
+    color: #fff;
+    background-color: #2ecc71;
+}
+#info{
+    margin-top: 20px;
+}
+    </style>
+}
+</head>
+<body>
+
+    <div id="game-board" class="board"></div>
+    <div id="info">
+        <p>Movimientos: <span id="move-counter">0</span></p>
+        <p>Tiempo: <span id="timer">0</span></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+    const cards = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+    let flippedCards = [];
+    let matchedCards = [];
+    let moves = 0;
+    let timer = 0;
+    let interval;
+
+    function barajear(array) {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
+    function initGame() {
+        const shuffledCards = barajear(cards);
+        const gameBoard = document.getElementById('game-board');
+
+        shuffledCards.forEach((card, index) => {
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('card');
+            cardElement.dataset.index = index;
+            cardElement.innerHTML = `
+                <div class="front"></div>
+                <div class="back">${card}</div>
+            `;
+            cardElement.addEventListener('click', voltearCarta);
+            gameBoard.appendChild(cardElement);
+        });
+        // Actualizar el temporizador en tu interfaz cada segundo
+        interval = setInterval(function () {
+            timer++;
+            document.getElementById('timer').innerText = timer;
+            actualizarTiempo();
+        }, 1000);
+    }
+
+    function voltearCarta() {
+        const card = this;
+        if (!flippedCards.includes(card) && flippedCards.length < 2) {
+            card.classList.add('flip');
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                setTimeout(coinciden, 1000);
+            }
+        }
+    }
+
+    function coinciden() {
+        const [card1, card2] = flippedCards;
+
+        if (card1.innerHTML === card2.innerHTML) {
+            matchedCards.push(card1, card2);
+            if (matchedCards.length === cards.length) {
+                clearInterval(interval);
+                alert('¡Felicidades! Has encontrado todos los pares.');
+            }
+        } else {
+            setTimeout(function () {
+                        card1.classList.remove('flip');
+                        card2.classList.remove('flip');
+            }, 500);
+        }
+
+        flippedCards = [];
+        moves++;
+        document.getElementById('move-counter').innerText = moves;        
+    }
+
+    function actualizarTiempo() {
+        const dias = Math.floor(timer / (60 * 60 * 24));
+        const horas = Math.floor((timer % (60 * 60 * 24)) / (60 * 60));
+        const minutos = Math.floor((timer % (60 * 60)) / 60);
+        const segundos = timer % 60;
+
+        let tiempoFormateado = '';
+
+        if (dias > 0) {
+            tiempoFormateado += `${dias} día${dias !== 1 ? 's' : ''} `;
+        }
+
+        if (horas > 0) {
+            tiempoFormateado += `${horas} hora${horas !== 1 ? 's' : ''} `;
+        }
+
+        if (minutos > 0) {
+            tiempoFormateado += `${minutos} minuto${minutos !== 1 ? 's' : ''} `;
+        }
+
+        tiempoFormateado += `${segundos} segundo${segundos !== 1 ? 's' : ''}`;
+
+        document.getElementById('timer').innerText = tiempoFormateado.trim();
+    }
+
+    initGame();
+});
+
+    </script>
+</body>
+</html>

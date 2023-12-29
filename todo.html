@@ -1,0 +1,61 @@
+<!--
+Hecho por Allan Ayes
+Si quieren las estructuras del sitio por separado, descomentar y crear los ficheros segun el nombre descrito en estos.
+-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>To-Do List</title>
+    <style>
+ .done {
+    text-decoration: line-through;
+    color: #888;
+}
+    </style>
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <ul id="todo-list"></ul>
+    <input type="text" id="new-task" placeholder="Nueva tarea">
+    <button onclick="addTask()">Agregar</button>
+
+    <script>
+function addTask() {
+        const newTaskInput = document.getElementById('new-task');
+        const taskList = document.getElementById('todo-list');
+    
+    if (newTaskInput.value !== '') {
+        const newTask = document.createElement('li');
+        newTask.textContent = newTaskInput.value;
+
+        const doneButton = document.createElement('button');
+        doneButton.textContent = 'Completada';
+        doneButton.onclick = markAsDone;
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Eliminar';
+        deleteButton.onclick = deleteTask;
+
+        newTask.appendChild(doneButton);
+        newTask.appendChild(deleteButton);
+
+        taskList.appendChild(newTask);
+        newTaskInput.value = '';
+    }
+}
+
+function markAsDone() {
+
+    const taskItem = this.parentElement;
+    taskItem.classList.toggle('done');
+}
+
+function deleteTask() {
+    const taskItem = this.parentElement;
+    taskItem.remove();
+}
+
+    </script>
+</body>
+</html>

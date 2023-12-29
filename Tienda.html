@@ -1,0 +1,208 @@
+<!--
+Hecho por Allan Ayes
+Si quieren las estructuras del sitio por separado, descomentar y crear los ficheros segun el nombre descrito en estos.
+-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tienda en Línea</title>
+    <!-link rel="stylesheet" href="styles.css"-->
+        <style>
+            body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+#cart-info {
+    float: right;
+}
+
+#cart-count {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+#cart-total {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+section {
+    margin: 20px;
+}
+
+#product-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+
+.product {
+    border: 1px solid #ccc;
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+.product:hover {
+    transform: scale(1.05);
+}
+
+#shopping-cart {
+    width: 30%;
+}
+
+#cart-items {
+    list-style: none;
+    padding: 0;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.cart-item button {
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.cart-item button:hover {
+    background-color: #c0392b;
+}
+
+footer {
+    text-align: center;
+    padding: 1em;
+    background-color: #333;
+    color: #fff;
+    margin-top: auto; 
+}
+
+        </style>
+</head>
+<body>
+    <header>
+        <h1>Tienda en Línea</h1>
+        <div id="cart-info">
+            <span id="cart-count">0</span>
+            <span id="cart-total">$0.00</span>
+        </div>
+    </header>
+    <section id="product-list"></section>
+    <section id="shopping-cart">
+        <h2>Carrito de Compras</h2>
+        <ul id="cart-items"></ul>
+    </section>
+    <footer>
+        <p>&copy; 2023 Allan Ayes</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+    const productList = document.getElementById('product-list');
+    const cartItems = document.getElementById('cart-items');
+    const cartCount = document.getElementById('cart-count');
+    const cartTotal = document.getElementById('cart-total');
+
+    const products = [
+        { id: 1, name: 'Producto A', price: 20.00 },
+        { id: 2, name: 'Producto B', price: 30.00 },
+        { id: 3, name: 'Producto C', price: 25.00 },
+        { id: 4, name: 'Producto D', price: 50.00 },
+        { id: 5, name: 'Producto E', price: 10.00 },
+        { id: 6, name: 'Producto F', price: 75.00 },
+        { id: 7, name: 'Producto X', price: 100.00 },
+        // Agregar más productos aquí o los cargas en JSON desde una web api
+    ];
+
+    let cart = [];
+
+    // Función para mostrar productos en la tienda
+    function muestraProductos() {
+        products.forEach(product => {
+            const productElement = document.createElement('div');
+            productElement.classList.add('product');
+            productElement.innerHTML = `
+                <h3>${product.name}</h3>
+                <p>${product.price.toFixed(2)} $</p>
+                <button onclick="addToCart(${product.id})">Agregar al Carrito</button>
+            `;
+            productList.appendChild(productElement);
+        });
+    }
+
+    // Función para agregar productos al carrito
+    window.addToCart = function (productId) {
+    const selectedProduct = products.find(product => product.id === productId);
+    const existingItem = cart.find(item => item.id === productId);
+
+    if (existingItem) {
+        // Si el producto ya está en el carrito, aumenta la cantidad
+        existingItem.quantity += 1;
+    } else {
+        // Si el producto no está en el carrito, agrégalo con cantidad 1
+        cart.push({ ...selectedProduct, quantity: 1 });
+    }
+
+    actualizaCarrito();
+};
+
+
+    // Función para actualizar el carrito
+    function actualizaCarrito() {
+        cartCount.textContent = cart.length;
+        renderCartItems();
+        calcTotal();
+    }
+
+    // Función para renderizar elementos en el carrito
+    function renderCartItems() {
+        cartItems.innerHTML = '';
+        cart.forEach(item => {
+            const cartItemElement = document.createElement('li');
+            cartItemElement.classList.add('cart-item');
+            cartItemElement.innerHTML = `
+                <span>${item.name} x${item.quantity}</span>
+                <span>${(item.price * item.quantity).toFixed(2)} $</span>
+                <button onclick="eliminaDelCarrito(${item.id})">Eliminar</button>
+            `;
+            cartItems.appendChild(cartItemElement);
+        });
+    }
+
+    // Función para eliminar productos del carrito
+    window.eliminaDelCarrito = function (productId) {
+        const index = cart.findIndex(item => item.id === productId);
+        if (index !== -1) {
+            cart.splice(index, 1);
+            actualizaCarrito();
+        }
+    };
+
+    // Función para calcular el total del carrito
+    function calcTotal() {
+        const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+        cartTotal.textContent = `$${total.toFixed(2)}`;
+    }
+
+    // Inicializar la tienda
+    muestraProductos();
+});
+
+    </script>
+</body>
+</html>
